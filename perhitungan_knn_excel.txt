@@ -1,0 +1,19 @@
+# Perhitungan Manual KNN di Excel
+
+1. Masukkan data tanaman (fitur dan label) ke sheet Excel.
+2. Input data tanaman baru yang ingin diprediksi (fitur saja).
+3. Hitung jarak Euclidean antara data baru dan setiap data pada dataset:
+   =SQRT((A2-A$12)^2 + (B2-B$12)^2 + ...)
+   (Ubah sesuai fitur yang digunakan)
+4. Urutkan jarak dari yang terkecil.
+5. Ambil K data terdekat (misal K=3).
+6. Lakukan voting: label yang paling banyak muncul dari K data terdekat adalah hasil prediksi.
+
+Contoh Tabel:
+| Nama         | Jenis        | Warna Daun | Bentuk Daun | Tinggi | Aroma   |
+|-------------|--------------|------------|-------------|--------|---------|
+| Jahe        | Herbal       | Hijau      | Lonjong     | 60     | Kuat    |
+| ...         | ...          | ...        | ...         | ...    | ...     |
+| Data Baru   | ?            | Hijau      | Bulat       | 50     | Lemah   |
+
+*Konversi fitur kategorikal ke angka sebelum perhitungan jarak.

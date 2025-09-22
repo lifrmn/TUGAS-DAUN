@@ -1,0 +1,15 @@
+# Dataset Tanaman Herbal dan Non-Herbal
+# Format: Nama, Jenis (Herbal/Non-Herbal), Warna Daun, Bentuk Daun, Tinggi (cm), Aroma
+# Contoh fitur: Warna Daun (Hijau/Tua/Muda), Bentuk Daun (Lonjong/Bulat/Lancip), Aroma (Kuat/Lemah/Tidak Ada)
+
+Jahe,Herbal,Hijau,Lonjong,60,Kuat
+Kunyit,Herbal,Hijau,Lonjong,50,Kuat
+Sirih,Herbal,Hijau,Bulat,30,Kuat
+Lidah Buaya,Herbal,Hijau,Lancip,40,Lemah
+Pandan,Herbal,Hijau,Lonjong,70,Kuat
+
+Tomat,Non-Herbal,Hijau,Bulat,80,Tidak Ada
+Bayam,Non-Herbal,Hijau,Lonjong,30,Lemah
+Cabai,Non-Herbal,Hijau,Lancip,60,Kuat
+Terong,Non-Herbal,Hijau,Bulat,90,Tidak Ada
+Wortel,Non-Herbal,Hijau,Lonjong,40,Tidak Ada

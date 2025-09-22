@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Plant Pro - Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <style>
+        /* CSS Custom Properties */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            --danger-gradient: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --backdrop-blur: blur(20px);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+            --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.25);
+            --border-radius: 12px;
+            --border-radius-lg: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -2;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .floating-shape {
+            position: absolute;
+            animation: float 20s infinite linear;
+        }
+
+        .floating-shape:nth-child(1) {
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .floating-shape:nth-child(2) {
+            top: 60%;
+            right: 15%;
+            animation-delay: -7s;
+        }
+
+        .floating-shape:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: -14s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(20px) rotate(240deg); }
+            100% { transform: translateY(0px) rotate(360deg); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border-right: 1px solid var(--glass-border);
+            padding: 30px 0;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header .fas {
+            background: var(--primary-gradient);
+            padding: 8px;
+            border-radius: var(--border-radius);
+            font-size: 1.2rem;
+        }
+
+        .version {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 16px 30px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left-color: var(--glass-border);
+        }
+
+        .sidebar-menu a.active {
+            background: var(--glass-bg);
+            color: white;
+            border-left-color: #4facfe;
+        }
+
+        .sidebar-menu a i {
+            width: 20px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .menu-badge {
+            margin-left: auto;
+            background: var(--secondary-gradient);
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .menu-divider {
+            margin: 15px 0;
+            border-bottom: 1px solid var(--glass-border);
+            opacity: 0.5;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 320px;
+            padding: 30px;
+            transition: var(--transition);
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+        }
+
+        .page-title .fas {
+            background: var(--primary-gradient);
+            padding: 12px;
+            border-radius: var(--border-radius);
+            font-size: 1.3rem;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-info h4 {
+            font-size: 0.9rem;
+            margin-bottom: 2px;
+        }
+
+        .user-info span {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+
+        .stat-card.success::before {
+            background: var(--success-gradient);
+        }
+
+        .stat-card.warning::before {
+            background: var(--warning-gradient);
+        }
+
+        .stat-card.danger::before {
+            background: var(--danger-gradient);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 15px;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            background: rgba(79, 172, 254, 0.2);
+            color: #4facfe;
+        }
+
+        .stat-change.negative {
+            background: rgba(255, 154, 158, 0.2);
+            color: #ff9a9e;
+        }
+
+        /* Charts Section */
+        .charts-section {
+            margin-bottom: 40px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        .chart-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+        }
+
+        /* Data Tables */
+        .table-section {
+            margin-bottom: 40px;
+        }
+
+        .table-container {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .table-header h3 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 18px 25px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .table th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Status Badges */
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: rgba(79, 172, 254, 0.2);
+            color: #4facfe;
+        }
+
+        .status-inactive {
+            background: rgba(255, 154, 158, 0.2);
+            color: #ff9a9e;
+        }
+
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 0.9rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 280px;
+            }
+            
+            .main-content {
+                margin-left: 280px;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .sidebar-toggle {
+                display: flex;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .top-bar {
+                padding: 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .page-title {
+                font-size: 1.8rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .user-profile {
+                padding: 10px 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .top-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .page-title {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-xl);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 10000;
+            max-width: 300px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid #4ade80;
+        }
+
+        .notification.error {
+            border-left: 4px solid #f87171;
+        }
+
+        .notification.warning {
+            border-left: 4px solid #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div id="particles-js"></div>
+    <div class="floating-shapes">
+        <div class="floating-shape">
+            <i class="fas fa-leaf" style="font-size: 3rem; color: rgba(255,255,255,0.1);"></i>
+        </div>
+        <div class="floating-shape">
+            <i class="fas fa-seedling" style="font-size: 2.5rem; color: rgba(255,255,255,0.1);"></i>
+        </div>
+        <div class="floating-shape">
+            <i class="fas fa-tree" style="font-size: 4rem; color: rgba(255,255,255,0.1);"></i>
+        </div>
+    </div>
+
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar glass" id="sidebar">
+            <div class="sidebar-header">
+                <h2>
+                    <i class="fas fa-robot"></i>
+                    AI Plant Pro
+                </h2>
+                <div class="version">v2.0 Beta</div>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#dashboard" class="active" onclick="showSection('dashboard')">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                        <div class="menu-badge">Live</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#analytics" onclick="showSection('analytics')">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#models" onclick="showSection('models')">
+                        <i class="fas fa-brain"></i>
+                        <span>ML Models</span>
+                        <div class="menu-badge">4</div>
+                    </a>
+                </li>
+                <li>
+                    <a href="#data" onclick="showSection('data')">
+                        <i class="fas fa-database"></i>
+                        <span>Dataset</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#users" onclick="showSection('users')">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#performance" onclick="showSection('performance')">
+                        <i class="fas fa-gauge-high"></i>
+                        <span>Performance</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#logs" onclick="showSection('logs')">
+                        <i class="fas fa-file-alt"></i>
+                        <span>System Logs</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#settings" onclick="showSection('settings')">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+                <li class="menu-divider"></li>
+                <li>
+                    <a href="index-super.html" style="color: #4facfe;">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back to App</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="../komunikasi-classifier.html" style="color: #f093fb;">
+                        <i class="fas fa-comments"></i>
+                        <span>Communication Classifier</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <div class="page-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <h1>Admin Dashboard</h1>
+                </div>
+                <div class="top-actions">
+                    <button class="btn btn-secondary" onclick="refreshData()">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
+                    <button class="btn btn-primary" onclick="exportData()">
+                        <i class="fas fa-download"></i>
+                        Export Data
+                    </button>
+                    <div class="user-profile">
+                        <div class="user-avatar">AD</div>
+                        <div class="user-info">
+                            <h4>Admin User</h4>
+                            <span>Super Admin</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <div class="stat-value" id="totalPredictions">1,247</div>
+                        <div class="stat-label">Total Predictions</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +12% from last month
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-value" id="accuracy">94.8%</div>
+                        <div class="stat-label">Model Accuracy</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +2.1% improvement
+                        </div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-value" id="activeUsers">156</div>
+                        <div class="stat-label">Active Users</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i> +8 new users
+                        </div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-value" id="errorRate">2.1%</div>
+                        <div class="stat-label">Error Rate</div>
+                        <div class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i> -0.5% reduced
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Prediction Trends</h3>
+                                <select class="btn btn-secondary" style="padding: 8px 16px;">
+                                    <option>Last 7 days</option>
+                                    <option>Last 30 days</option>
+                                    <option>Last 3 months</option>
+                                </select>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="predictionsChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Model Performance</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="performanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="table-section">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <h3>Recent Predictions</h3>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>User</th>
+                                    <th>Image</th>
+                                    <th>Prediction</th>
+                                    <th>Confidence</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2 minutes ago</td>
+                                    <td>user123</td>
+                                    <td>plant_001.jpg</td>
+                                    <td>Aloe Vera (Herbal)</td>
+                                    <td>96.8%</td>
+                                    <td><span class="status status-active">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>5 minutes ago</td>
+                                    <td>botanist99</td>
+                                    <td>leaf_sample.jpg</td>
+                                    <td>Rose (Non-Herbal)</td>
+                                    <td>89.2%</td>
+                                    <td><span class="status status-active">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>8 minutes ago</td>
+                                    <td>researcher1</td>
+                                    <td>herb_photo.jpg</td>
+                                    <td>Ginseng (Herbal)</td>
+                                    <td>94.5%</td>
+                                    <td><span class="status status-active">Success</span></td>
+                                </tr>
+                                <tr>
+                                    <td>12 minutes ago</td>
+                                    <td>student456</td>
+                                    <td>unknown_plant.jpg</td>
+                                    <td>Low Quality Image</td>
+                                    <td>45.1%</td>
+                                    <td><span class="status status-inactive">Failed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>15 minutes ago</td>
+                                    <td>expert777</td>
+                                    <td>medicinal_herb.jpg</td>
+                                    <td>Turmeric (Herbal)</td>
+                                    <td>98.3%</td>
+                                    <td><span class="status status-active">Success</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics" class="section">
+                <div class="charts-section">
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Usage Analytics</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="usageChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Accuracy by Algorithm</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="algorithmChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Models Section -->
+            <div id="models" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>Machine Learning Models</h3>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Model Name</th>
+                                <th>Type</th>
+                                <th>Accuracy</th>
+                                <th>Training Data</th>
+                                <th>Last Updated</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CNN Plant Classifier</td>
+                                <td>Deep Learning</td>
+                                <td>94.8%</td>
+                                <td>15,000 images</td>
+                                <td>2 days ago</td>
+                                <td><span class="status status-active">Active</span></td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>KNN Classifier</td>
+                                <td>Traditional ML</td>
+                                <td>87.3%</td>
+                                <td>12,000 images</td>
+                                <td>1 week ago</td>
+                                <td><span class="status status-active">Active</span></td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>SVM Classifier</td>
+                                <td>Traditional ML</td>
+                                <td>89.1%</td>
+                                <td>10,000 images</td>
+                                <td>3 days ago</td>
+                                <td><span class="status status-active">Active</span></td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">View</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>PSO-KNN Hybrid</td>
+                                <td>Optimized ML</td>
+                                <td>92.7%</td>
+                                <td>8,000 images</td>
+                                <td>1 day ago</td>
+                                <td><span class="status status-active">Active</span></td>
+                                <td>
+                                    <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">View</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Data Section -->
+            <div id="data" class="section">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <div class="stat-value">23,456</div>
+                        <div class="stat-label">Total Images</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-seedling"></i>
+                        </div>
+                        <div class="stat-value">15,234</div>
+                        <div class="stat-label">Herbal Plants</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="fas fa-flower"></i>
+                        </div>
+                        <div class="stat-value">8,222</div>
+                        <div class="stat-label">Non-Herbal Plants</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-icon">
+                            <i class="fas fa-tag"></i>
+                        </div>
+                        <div class="stat-value">124</div>
+                        <div class="stat-label">Plant Categories</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div id="users" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>User Management</h3>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Predictions</th>
+                                <th>Last Active</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>botanist99</td>
+                                <td>botanist@example.com</td>
+                                <td>Researcher</td>
+                                <td>456</td>
+                                <td>5 minutes ago</td>
+                                <td><span class="status status-active">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>student456</td>
+                                <td>student@university.edu</td>
+                                <td>Student</td>
+                                <td>123</td>
+                                <td>2 hours ago</td>
+                                <td><span class="status status-active">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td>expert777</td>
+                                <td>expert@research.org</td>
+                                <td>Expert</td>
+                                <td>789</td>
+                                <td>1 day ago</td>
+                                <td><span class="status status-pending">Pending</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Performance Section -->
+            <div id="performance" class="section">
+                <div class="charts-section">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3 class="chart-title">System Performance</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="systemChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Section -->
+            <div id="logs" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h3>System Logs</h3>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Level</th>
+                                <th>Message</th>
+                                <th>User</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2024-01-15 14:30:25</td>
+                                <td><span class="status status-active">INFO</span></td>
+                                <td>Plant prediction successful</td>
+                                <td>user123</td>
+                                <td>192.168.1.100</td>
+                            </tr>
+                            <tr>
+                                <td>2024-01-15 14:25:10</td>
+                                <td><span class="status status-inactive">ERROR</span></td>
+                                <td>Image processing failed</td>
+                                <td>student456</td>
+                                <td>192.168.1.101</td>
+                            </tr>
+                            <tr>
+                                <td>2024-01-15 14:20:05</td>
+                                <td><span class="status status-pending">WARN</span></td>
+                                <td>Low confidence prediction</td>
+                                <td>botanist99</td>
+                                <td>192.168.1.102</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="section">
+                <div class="chart-card">
+                    <h3 class="chart-title">System Settings</h3>
+                    <div style="padding: 20px 0;">
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Model Confidence Threshold</label>
+                            <input type="range" min="50" max="99" value="80" style="width: 100%; margin-bottom: 8px;">
+                            <span style="color: rgba(255,255,255,0.7);">Current: 80%</span>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Auto-Retrain Interval</label>
+                            <select style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--glass-bg); color: white;">
+                                <option>Daily</option>
+                                <option selected>Weekly</option>
+                                <option>Monthly</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600;">Email Notifications</label>
+                            <input type="checkbox" checked> Enable error notifications<br>
+                            <input type="checkbox" checked> Enable performance reports<br>
+                            <input type="checkbox"> Enable user activity alerts
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Particles.js configuration
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#ffffff" },
+                shape: { type: "circle" },
+                opacity: { value: 0.1, random: false },
+                size: { value: 3, random: true },
+                line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.1, width: 1 },
+                move: { enable: true, speed: 2, direction: "none", random: false, straight: false, out_mode: "out", bounce: false }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: { onhover: { enable: true, mode: "repulse" }, onclick: { enable: true, mode: "push" }, resize: true },
+                modes: { grab: { distance: 400, line_linked: { opacity: 1 } }, bubble: { distance: 400, size: 40, duration: 2, opacity: 8, speed: 3 }, repulse: { distance: 200, duration: 0.4 }, push: { particles_nb: 4 }, remove: { particles_nb: 2 } }
+            },
+            retina_detect: true
+        });
+
+        // Dashboard functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[href="#${sectionId}"]`).classList.add('active');
+            
+            // Update page title
+            const titles = {
+                'dashboard': 'Admin Dashboard',
+                'analytics': 'Analytics Overview',
+                'models': 'ML Models Management',
+                'data': 'Dataset Management',
+                'users': 'User Management',
+                'performance': 'System Performance',
+                'logs': 'System Logs',
+                'settings': 'System Settings'
+            };
+            document.querySelector('.page-title h1').textContent = titles[sectionId] || 'Admin Dashboard';
+            
+            // Initialize charts for the section
+            if (sectionId === 'dashboard') {
+                initDashboardCharts();
+            } else if (sectionId === 'analytics') {
+                initAnalyticsCharts();
+            } else if (sectionId === 'performance') {
+                initPerformanceCharts();
+            }
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        function refreshData() {
+            showNotification('Data refreshed successfully!', 'success');
+            // Simulate data refresh
+            updateStats();
+        }
+
+        function exportData() {
+            showNotification('Data export started...', 'success');
+            // Simulate data export
+            setTimeout(() => {
+                showNotification('Data exported successfully!', 'success');
+            }, 2000);
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 100);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => document.body.removeChild(notification), 300);
+            }, 3000);
+        }
+
+        function updateStats() {
+            // Simulate real-time stats updates
+            const stats = {
+                totalPredictions: Math.floor(1200 + Math.random() * 100),
+                accuracy: (94 + Math.random() * 2).toFixed(1),
+                activeUsers: Math.floor(150 + Math.random() * 20),
+                errorRate: (2 + Math.random() * 0.5).toFixed(1)
+            };
+            
+            Object.keys(stats).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.textContent = key === 'accuracy' || key === 'errorRate' ? stats[key] + '%' : stats[key];
+                }
+            });
+        }
+
+        function initDashboardCharts() {
+            // Predictions Chart
+            const predictionsCtx = document.getElementById('predictionsChart');
+            if (predictionsCtx) {
+                new Chart(predictionsCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{
+                            label: 'Predictions',
+                            data: [65, 78, 90, 81, 95, 105, 110],
+                            borderColor: '#4facfe',
+                            backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        },
+                        scales: {
+                            x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                            y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                        }
+                    }
+                });
+            }
+            
+            // Performance Chart
+            const performanceCtx = document.getElementById('performanceChart');
+            if (performanceCtx) {
+                new Chart(performanceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['CNN', 'KNN', 'SVM', 'PSO-KNN'],
+                        datasets: [{
+                            data: [94.8, 87.3, 89.1, 92.7],
+                            backgroundColor: ['#4facfe', '#f093fb', '#ffecd2', '#ff9a9e']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initAnalyticsCharts() {
+            // Usage Chart
+            const usageCtx = document.getElementById('usageChart');
+            if (usageCtx) {
+                new Chart(usageCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{
+                            label: 'Monthly Usage',
+                            data: [120, 190, 300, 500, 200, 300],
+                            backgroundColor: '#4facfe'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        },
+                        scales: {
+                            x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                            y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                        }
+                    }
+                });
+            }
+            
+            // Algorithm Chart
+            const algorithmCtx = document.getElementById('algorithmChart');
+            if (algorithmCtx) {
+                new Chart(algorithmCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Accuracy', 'Speed', 'Memory', 'Reliability'],
+                        datasets: [{
+                            label: 'CNN',
+                            data: [95, 70, 60, 90],
+                            borderColor: '#4facfe',
+                            backgroundColor: 'rgba(79, 172, 254, 0.2)'
+                        }, {
+                            label: 'KNN',
+                            data: [87, 90, 85, 80],
+                            borderColor: '#f093fb',
+                            backgroundColor: 'rgba(240, 147, 251, 0.2)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        },
+                        scales: {
+                            r: {
+                                ticks: { color: 'white' },
+                                grid: { color: 'rgba(255,255,255,0.1)' }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initPerformanceCharts() {
+            const systemCtx = document.getElementById('systemChart');
+            if (systemCtx) {
+                new Chart(systemCtx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                        datasets: [{
+                            label: 'CPU Usage',
+                            data: Array.from({length: 24}, () => Math.random() * 100),
+                            borderColor: '#4facfe',
+                            backgroundColor: 'rgba(79, 172, 254, 0.1)'
+                        }, {
+                            label: 'Memory Usage',
+                            data: Array.from({length: 24}, () => Math.random() * 100),
+                            borderColor: '#f093fb',
+                            backgroundColor: 'rgba(240, 147, 251, 0.1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: 'white' } }
+                        },
+                        scales: {
+                            x: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                            y: { ticks: { color: 'white' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initDashboardCharts();
+            updateStats();
+            
+            // Update stats every 30 seconds
+            setInterval(updateStats, 30000);
+            
+            // Show welcome notification
+            setTimeout(() => {
+                showNotification('Welcome to AI Plant Pro Admin Dashboard!', 'success');
+            }, 1000);
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && !sidebar.contains(e.target) && !toggleBtn.contains(e.target)) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

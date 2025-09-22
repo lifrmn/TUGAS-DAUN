@@ -1,0 +1,27 @@
+# Dataset Klasifikasi Komunikasi - Verbal vs Non-Verbal
+# Format: Objek, Kategori (Verbal/Non-Verbal), Bentuk, Warna, Ukuran, Tekstur, Kompleksitas
+# Untuk analisis gambar dengan fitur visual yang dapat diekstrak
+
+# VERBAL - Objek yang berhubungan dengan komunikasi verbal
+Buku,Verbal,Persegi,Putih,Sedang,Halus,Tinggi
+Papan Tulis,Verbal,Persegi,Putih,Besar,Halus,Sedang
+Mikrofon,Verbal,Bulat,Hitam,Kecil,Logam,Tinggi
+Spidol,Verbal,Silinder,Biru,Kecil,Plastik,Rendah
+Laptop,Verbal,Persegi,Abu,Sedang,Logam,Tinggi
+Smartphone,Verbal,Persegi,Hitam,Kecil,Kaca,Tinggi
+Koran,Verbal,Persegi,Putih,Sedang,Kertas,Sedang
+Pensil,Verbal,Silinder,Kuning,Kecil,Kayu,Rendah
+Radio,Verbal,Persegi,Hitam,Sedang,Plastik,Sedang
+Telepon,Verbal,Persegi,Putih,Sedang,Plastik,Sedang
+
+# NON-VERBAL - Objek yang berhubungan dengan komunikasi non-verbal
+Cermin,Non-Verbal,Persegi,Transparan,Sedang,Kaca,Rendah
+Lukisan,Non-Verbal,Persegi,Beragam,Besar,Kanvas,Tinggi
+Patung,Non-Verbal,Tidak_Beraturan,Abu,Besar,Batu,Tinggi
+Emoji_Plakat,Non-Verbal,Bulat,Kuning,Kecil,Plastik,Sedang
+Lampu_Isyarat,Non-Verbal,Bulat,Merah,Sedang,Logam,Sedang
+Bendera,Non-Verbal,Persegi,Merah,Sedang,Kain,Rendah
+Poster,Non-Verbal,Persegi,Beragam,Besar,Kertas,Sedang
+Rambu_Lalu_Lintas,Non-Verbal,Segitiga,Merah,Besar,Logam,Sedang
+Gestur_Tangan,Non-Verbal,Tidak_Beraturan,Kulit,Kecil,Organik,Tinggi
+Ekspresi_Wajah,Non-Verbal,Bulat,Kulit,Sedang,Organik,Tinggi
