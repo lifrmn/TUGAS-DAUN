@@ -218,40 +218,6 @@ def pso_classify(input_features):
         'accuracy': 0.945
     }
 
-def svm_classify(input_features):
-    """Klasifikasi menggunakan SVM (simulasi sklearn)"""
-    from sklearn import svm
-    X = [item['features'] for item in COMMUNICATION_DATASET]
-    y = [1 if item['kategori'] == 'Verbal' else 0 for item in COMMUNICATION_DATASET]
-    clf = svm.SVC(kernel='linear', probability=True)
-    clf.fit(X, y)
-    pred = clf.predict([input_features])[0]
-    prob = clf.predict_proba([input_features])[0][pred]
-    prediction = 'Verbal' if pred == 1 else 'Non-Verbal'
-    return {
-        'prediction': prediction,
-        'confidence': float(prob),
-        'algorithm': 'SVM',
-        'accuracy': 0.95
-    }
-
-def nn_classify(input_features):
-    """Klasifikasi menggunakan Neural Network sederhana (MLPClassifier)"""
-    from sklearn.neural_network import MLPClassifier
-    X = [item['features'] for item in COMMUNICATION_DATASET]
-    y = [1 if item['kategori'] == 'Verbal' else 0 for item in COMMUNICATION_DATASET]
-    clf = MLPClassifier(hidden_layer_sizes=(16,), max_iter=500)
-    clf.fit(X, y)
-    pred = clf.predict([input_features])[0]
-    prob = max(clf.predict_proba([input_features])[0])
-    prediction = 'Verbal' if pred == 1 else 'Non-Verbal'
-    return {
-        'prediction': prediction,
-        'confidence': float(prob),
-        'algorithm': 'Neural Network',
-        'accuracy': 0.96
-    }
-
 def base64_to_image(base64_string):
     """Convert base64 string to OpenCV image"""
     try:
@@ -509,35 +475,22 @@ def classify_image():
         if algorithm in ['knn', 'both']:
             knn_result = knn_classify(features)
             result['knn_result'] = knn_result
+        
         # Run PSO classification  
         if algorithm in ['pso', 'both']:
             pso_result = pso_classify(features)
             result['pso_result'] = pso_result
-        # Run SVM classification
-        if algorithm in ['svm', 'both']:
-            svm_result = svm_classify(features)
-            result['svm_result'] = svm_result
-        # Run Neural Network classification
-        if algorithm in ['nn', 'neural', 'neuralnetwork', 'neural_network', 'both']:
-            nn_result = nn_classify(features)
-            result['nn_result'] = nn_result
+        
         # Add comparison if both algorithms ran
         if algorithm == 'both' and 'knn_result' in result and 'pso_result' in result:
             knn_pred = result['knn_result']['prediction']
             pso_pred = result['pso_result']['prediction']
+            
             result['comparison'] = {
                 'agreement': knn_pred == pso_pred,
                 'knn_confidence': result['knn_result']['confidence'],
                 'pso_confidence': result['pso_result']['confidence'],
                 'recommended': 'PSO' if result['pso_result']['confidence'] > result['knn_result']['confidence'] else 'KNN'
-            }
-        # Add comparison for all algorithms if 'both' selected
-        if algorithm == 'both':
-            result['all_predictions'] = {
-                'KNN': result.get('knn_result', {}).get('prediction'),
-                'PSO': result.get('pso_result', {}).get('prediction'),
-                'SVM': result.get('svm_result', {}).get('prediction'),
-                'NeuralNetwork': result.get('nn_result', {}).get('prediction')
             }
         
         processing_time = (datetime.now() - start_time).total_seconds()
@@ -672,24 +625,6 @@ def test_page():
                         <p><strong>Prediction:</strong> ${data.pso_result.prediction}</p>
                         <p><strong>Confidence:</strong> ${(data.pso_result.confidence * 100).toFixed(1)}%</p>
                         <p><strong>Accuracy:</strong> ${(data.pso_result.accuracy * 100).toFixed(1)}%</p>
-                    `;
-                }
-                
-                if (data.svm_result) {
-                    html += `
-                        <h4>📈 SVM Result</h4>
-                        <p><strong>Prediction:</strong> ${data.svm_result.prediction}</p>
-                        <p><strong>Confidence:</strong> ${(data.svm_result.confidence * 100).toFixed(1)}%</p>
-                        <p><strong>Accuracy:</strong> ${(data.svm_result.accuracy * 100).toFixed(1)}%</p>
-                    `;
-                }
-                
-                if (data.nn_result) {
-                    html += `
-                        <h4>🧬 Neural Network Result</h4>
-                        <p><strong>Prediction:</strong> ${data.nn_result.prediction}</p>
-                        <p><strong>Confidence:</strong> ${(data.nn_result.confidence * 100).toFixed(1)}%</p>
-                        <p><strong>Accuracy:</strong> ${(data.nn_result.accuracy * 100).toFixed(1)}%</p>
                     `;
                 }
                 
